@@ -1,0 +1,105 @@
+###############################
+# Generate data of x, y and z #
+###############################
+.libPaths("~/Rlibs")
+iter<-as.numeric(commandArgs()[8])
+library(mvtnorm)
+library(matrixcalc)
+library(Matrix)
+library(rjags)
+fisher<-function(x){1/2*log((1+x)/(1-x))}
+inv.fisher<-function(x){return((exp(2*x)-1)/(exp(2*x)+1))}
+
+# Generating y
+getY<-function(x,nb,method="original"){
+  if (method=="combination"){
+    # 1. combination of orginal data, form a 20 column matrix
+    y=c()
+    col=nb
+    for (j in 1:(col-1)){
+      for (k in (j+1):col){
+        cat(j,k,"\n")
+        y=cbind(y, x[,c(j,k)])
+      }
+    }
+    return(y)
+  } else if (method=="multiplication"){
+    # 2. xi*xj stands for the log[(1+rho)/(1-rho)]
+    y=c()
+    col=nb
+    for (j in 1:(col-1)){
+      for (k in (j+1):col){
+        #cat(j,k,"\n")
+        y=cbind(y, x[,j]*x[,k])
+      }
+    }
+    return(y)
+  }else if (method=="original"){
+    # 3. Just use x as response variable
+    y=x
+    return(y)
+  }
+}
+nb=5 # number of gene
+q=choose(nb,2) # size of combination
+tau0<-rep(0,q) # real value of tau0 and tau1
+wh<-rep(7:10,(q%/%10))+rep(0:((q%/%10)-1),rep(4,(q%/%10)))*10
+tau1<-rep(0,q)
+tau1[wh]<-c(0.1,0.2,0.3,0.5)
+n.loop=c(200,500,1000)
+for(n in n.loop){
+  zfile<-paste("/work/wenda/spsl/simulation/performance/data/z_",n,"_",iter,".RData",sep="")
+  load(zfile)
+  xfile<-paste("/work/wenda/spsl/simulation/performance/data/x_",n,"_",iter,".RData",sep="")
+  load(xfile)
+  y<-getY(scale(x),nb=nb,method="multiplication")
+  # Gaussian copula - multivariate uniform distribution
+  omega<-solve(cor(y))
+  model1_stringM3<- "
+  model{
+    for(i in 1:n){
+        y[i,] ~ dmnorm(mu[i,], omega[,])
+        for(j in 1:q){
+          mu[i,j]<-1-2/(exp(2*(alpha[j]+z[i]*beta[j]))+1)
+        }
+    }
+    for (j in 1:q) {
+      beta[j]~dnorm(0,s[j])
+      s[j]<-1/(vars[j])
+      vars[j]<-tau[j]*r[j]
+      tau[j]<-1/invtau[j]
+      invtau[j]~dgamma(5,50)
+      r[j]<-w[j]+0.005*w[j]
+      w[j]<-pnorm(p[j],0,1)
+      alpha[j]~dnorm(0,n-3)
+    }
+    p~dmnorm(rep(0,10),omega)
+  }
+  "
+  jags_data = list(n=n,y=y,z=z,q=q,omega=omega)
+  n.iter=5000
+  time1<-Sys.time()
+  # add try to jags.model to find out problems when jags is canceled
+  jags_model = try(jags.model(textConnection(model1_stringM3),data=jags_data,n.adapt=0,n.chains=1))
+  class(jags_model)
+  update(jags_model,n.iter=n.iter)
+  coda_sample = coda.samples(jags_model, c("alpha","beta","w","vars","r"),n.iter = n.iter
+                             , n.burnin=2500)
+  time2<-Sys.time()
+  time<-time2-time1
+  
+  dirname.time=paste("/work/wenda/spsl/simulation/performance/cb2/time_q",q,"_n",n,sep="")
+  if(!file.exists(dirname.time)){
+    dir.create(dirname.time)
+  }
+  filename=paste(dirname.time,"/time",iter,".RData",sep="")
+  save(time,file=filename)
+  dirname.data=paste("/work/wenda/spsl/simulation/performance/cb2/data_q",q,"_n",n,sep="")
+  if(!file.exists(dirname.data)){
+    dir.create(dirname.data)
+  }
+  filename=paste(dirname.data,"/coda_sample",iter,".RData",sep="")
+  save(coda_sample,file=filename)
+}
+
+

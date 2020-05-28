@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1590634861208.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2174642917",
+    "id" : "87D13222",
+    "lastKnownWriteTime" : 1590641645,
+    "last_content_update" : 1590641645231,
+    "path" : "C:/Users/Administrator/OneDrive - University of South Carolina/Research/R package/DGCspsl/DGCspsl/R/spsl.R",
+    "project_path" : "R/spsl.R",
+    "properties" : {
+        "cursorPosition" : "55,21",
+        "scrollLine" : "51"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
