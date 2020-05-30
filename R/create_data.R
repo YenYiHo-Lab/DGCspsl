@@ -14,9 +14,9 @@ nb <- nb # number of gene
 q <- choose(nb,2) # size of combination
 n <- n
 # setting dynamic correlation
-rho<-inv.fisher(t(t(outer(z,tau1))+tau0))
 # Generating z
 z<-runif(n,0,1)
+rho<-inv.fisher(t(t(outer(z,tau1))+tau0))
 # Generating x
 time1<-Sys.time()
 x<-matrix(rep(0,nb*n),nrow=n)
