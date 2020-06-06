@@ -3,10 +3,11 @@
 ###########################
 #  Correlated spsl model  #
 ###########################
+if("rjags" %in% rownames(installed.packages()) == FALSE) {install.packages("rjags")}
 library(rjags)
 cspsl <- function(data,
                   z,
-                  n.iter = 500,
+                  n.iter = 5000,
                   n.chains = 1) {
   fisher <- function(x)
     return(1 / 2 * log((1 + x) / (1 - x)))
@@ -25,16 +26,16 @@ cspsl <- function(data,
     }
     return(y)
   }
-  omega <- solve(cor(y))
   y <- getY(scale(x), nb = nb)
+  omega <- solve(cor(y))
   # correlated spike and slab
   model1_stringM1 <- "
   model{
     for(i in 1:n){
-        y[i,] ~ dmnorm(mu[i,], omega[,])
-        for(j in 1:q){
-          mu[i,j]<-1-2/(exp(2*(tau0[j]+z[i]*tau1[j]))+1)
-        }
+      for(j in 1:q){
+        y[i,j] ~ dnorm(1-2/(exp(2*mu[i,j])+1), prec[j])
+        mu[i,j]<-tau0[j]+z[i]*tau1[j]
+      }
     }
     for (j in 1:q) {
       tau1[j]~dnorm(0,s[j])
@@ -44,7 +45,8 @@ cspsl <- function(data,
       invtau[j]~dgamma(5,50)
       r[j]<-w[j]+0.005*w[j]
       w[j]<-pnorm(p[j],0,1)
-      tau0[j]~dnorm(0,n-3)
+      prec[j]~dgamma(0.01,0.01)
+      tau0[j]~dnorm(0,0.001)
     }
     p~dmnorm(rep(0,10),omega)
   }

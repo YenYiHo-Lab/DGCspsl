@@ -2,10 +2,11 @@
 ############################
 #  Independent spsl model  #
 ############################
+if("rjags" %in% rownames(installed.packages()) == FALSE) {install.packages("rjags")}
 library(rjags)
 spsl <- function(data,
                  z,
-                 n.iter = 500,
+                 n.iter = 5000,
                  n.chains = 1) {
   fisher <- function(x)
     return(1 / 2 * log((1 + x) / (1 - x)))
@@ -44,7 +45,7 @@ spsl <- function(data,
       r[j]<-w[j]+0.005*w[j]
       w[j]~dunif(0,1)
       prec[j]~dgamma(0.01,0.01)
-      tau0[j]~dnorm(0,n-3)
+      tau0[j]~dnorm(0,0.001)
     }
   }
   "
