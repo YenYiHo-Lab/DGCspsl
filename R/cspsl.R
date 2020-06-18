@@ -48,7 +48,7 @@ cspsl <- function(data,
       prec[j]~dgamma(0.01,0.01)
       tau0[j]~dnorm(0,0.001)
     }
-    p~dmnorm(rep(0,10),omega)
+    p~dmnorm(rep(0,q),omega)
   }
   "
   jags_data = list(
