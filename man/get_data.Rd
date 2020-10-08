@@ -45,12 +45,9 @@ Wenda Zhang
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-# set tau0<-(0,0,0,0,0,0,0,0,0,0)
-# set tau1<-(0,0,0,0,0,0,0.1,0.2,0.3,0.5)
-tau0<-rep(0,q)
-wh<-rep(7:10,(q%/%10))+rep(0:((q%/%10)-1),rep(4,(q%/%10)))*10
-tau1<-rep(0,q)
-tau1[wh]<-c(0.1,0.2,0.3,0.5)
+# set tau0 and tau1 to generate data
+tau0<-c(0,0,0,0,0,0,0,0,0,0)
+tau1<-c(0,0,0,0,0,0,0.1,0.2,0.3,0.5)
 data <- get_data(n=100, nb=5, tau0=tau0, tau1=tau1)
 x <- data[[1]]
 z <- data[[2]]

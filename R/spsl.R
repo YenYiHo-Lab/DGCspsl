@@ -27,7 +27,38 @@ spsl <- function(data,
   }
   # load data
   y <- getY(scale(x), nb = nb)
+  if (q > 1){
+    y.str <- apply(y, 2, function(x) qnorm(rank(x)/(n + 1)))
+  } else if (q == 1) {
+    y.str <- qnorm(rank(y)/(n + 1))
+  } else {
+    print("There is no input")
+  }
+
   # independent spike and slab
+  if (q == 1){
+    model1_stringM1 <- "
+  model{
+    for(i in 1:n){
+        y[i] ~ dnorm(1-2/(exp(2*mu[i])+1), prec)
+        mu[i]<-tau0+z[i]*tau1
+    }
+      tau1~dnorm(0,s)
+      s<-1/(vars)
+      vars<-tau*r
+      tau<-1/invtau
+      invtau~dgamma(5,50)
+      r<-w+0.005*w
+      w~dunif(0,1)
+      prec~dgamma(0.01,0.01)
+      tau0~dnorm(0,1)
+  }
+  "
+    jags_data = list(n = n,
+                     y = y.str,
+                     z = z
+                     )
+  } else if (q > 1) {
   model1_stringM1 <- "
   model{
     for(i in 1:n){
@@ -45,14 +76,16 @@ spsl <- function(data,
       r[j]<-w[j]+0.005*w[j]
       w[j]~dunif(0,1)
       prec[j]~dgamma(0.01,0.01)
-      tau0[j]~dnorm(0,0.001)
+      tau0[j]~dnorm(0,1)
     }
   }
   "
   jags_data = list(n = n,
-                   y = y,
+                   y = y.str,
                    z = z,
                    q = q)
+  }
+
   n.iter = n.iter
   time1 <- Sys.time()
   jags_model = try(jags.model(
