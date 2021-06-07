@@ -31,6 +31,7 @@ A vector of independent variable, where each element represents the cancer recur
 \item{a2}{Scale parameter used in the inverse gamma distribution}
 \item{e}{Step size used in the initial stage where independent normal proposal distributions are applied.}
 \item{Sd}{Step size used in the adaptive stage to control the acceptance rate.}
+
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~

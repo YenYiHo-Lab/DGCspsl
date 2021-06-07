@@ -18,6 +18,7 @@ get_data(n, nb, tau0, tau1)
 \item{nb}{The number of columns in x}
 \item{tau0}{The fisher's Z-transformed correlation coefficient between every two genes when z is 0}
 \item{tau1}{The association between z and fisher's Z-transformed correlation coefficient between every two genes}
+
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
