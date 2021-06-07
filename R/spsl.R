@@ -32,6 +32,7 @@ spsl <-
     }
     y <- getY(scale(x), nb = nb)
     z = as.matrix(z)
+
     col = length(startvalue)
     tau0wh = seq(1, col, by = 4)
     tau1wh = seq(2, col, by = 4)
