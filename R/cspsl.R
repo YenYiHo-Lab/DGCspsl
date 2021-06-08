@@ -38,7 +38,12 @@ cspsl <-
     tau1wh = seq(2, col - 1, by = 4)
     v2wh = seq(3, col - 1, by = 4)
     wwh = seq(4, col - 1, by = 4)
-
+    fisher <- function(x){
+      return(1 / 2 * log((1 + x) / (1 - x)))
+    }
+    inv.fisher <- function(x){
+      return((exp(2 * x) - 1) / (exp(2 * x) + 1))
+    }
     logit = function(x) {
       return(log(x / (1 - x)))
     }
